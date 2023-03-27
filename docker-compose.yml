@@ -1,0 +1,34 @@
+version: '3' # specify docker-compose version
+services:
+  protei-dotnet-telegram-bot:
+    container_name: protei-dotnet-telegram-bot
+    image: paulrozhkin/protei-dotnet-telegram-bot
+    ports:
+      - 4567:80
+    environment:
+      - ConnectionStrings__HangfireConnection=Host=telegram-bot-postgres;Database=dotnettelegrambot_hangfire;Username=postgres;Password=sql
+      - ConnectionStrings__DatabaseConnection=Host=telegram-bot-postgres;Database=dotnettelegrambot;Username=postgres;Password=sql
+      - Telegram__BotToken=<TelegramToken>
+      - Telegram__ChatId=<TelegramChatId>
+      - YouTrack__Token=<YouTrackToken>
+      - YouTrack__Task=<YouTrackTask>
+      - YouTrack__Url=<YouTrackUrl>
+      - NotificationCron__NotifyDutyAtHourUtc=5
+    depends_on:
+      - telegram-bot-postgres
+
+  telegram-bot-postgres:
+    image: postgres
+    container_name: telegram-bot-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=sql      
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - telegram_bot_postgres_data:/var/lib/postgresql/data
+      - ./sql/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+
+volumes:
+  telegram_bot_postgres_data:
