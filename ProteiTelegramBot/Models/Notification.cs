@@ -71,3 +71,29 @@ public class MergeRequestMergedNotification : MergeRequestNotificationBase
         return messege;
     }
 }
+
+public class PipelineNotification : MergeRequestNotificationBase
+{
+    private readonly string _url;
+    private readonly string _title;
+    private readonly string _creator;
+
+
+    public PipelineNotification(string url,
+        string title, string creator)
+    {
+        _url = url;
+        _title = title;
+        _creator = creator;
+    }
+
+    public override string GetMessage()
+    {
+        var message =
+            "***⚠️ Pipeline happened ***" +
+            "\r\n" +
+            $"[{RemoveInvalidTelegramCharacters(_title)}]({_url}) (opened by {_creator})";
+        return message;
+    }
+}
+

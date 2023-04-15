@@ -23,49 +23,19 @@ public class WebHooksController : ControllerBase
     [HttpPost("gitlab")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult> GitLabWebHookAsync(Event happendEvent)
-    {
-        try
-        {
-            switch (happendEvent.ObjectKind)
-            {
-                case "pipeline":
-                    {
-                        if (await GitLabWebHookPipelineAsync(happendEvent))
-                            return Ok();
-                        break;
-                    }
-                case "merge_request":
-                    {
-                        if (await GitLabWebHookMergeRequestAsync(happendEvent))
-                            return Ok();
-                        break;
-                    }
-            }
-            return Ok();
-
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e.ToString());
-            return Problem(statusCode: (int)HttpStatusCode.InternalServerError, detail: e.Message,
-                title: Errors.Common_Internal_Server_Error); ;
-        }
-    }
-
-    private async Task<bool> GitLabWebHookMergeRequestAsync(Event mergeRequestEvent)
+    public async Task<ActionResult> GitLabWebHookAsync(MergeRequestEventRequest mergeRequestEvent)
     {
         try
         {
             _logger.LogInformation(
-                        $"Receive new WebHook for {mergeRequestEvent.Project.Name}\n\rTitle:{mergeRequestEvent.ObjectAttributes.Title}");
+                $"Receive new WebHook for {mergeRequestEvent.Project.Name}\n\rTitle:{mergeRequestEvent.ObjectAttributes.Title}");
             switch (mergeRequestEvent.ObjectAttributes.Action)
             {
                 case "open":
                     {
                         await _notifier.Notify(new MergeRequestOpenedNotification(mergeRequestEvent.ObjectAttributes.Url,
                             mergeRequestEvent.ObjectAttributes.Title,
-                            mergeRequestEvent.User.Username)); //эта функция отправляет уведомление то самое
+                            mergeRequestEvent.User.Username));
                         break;
                     }
                 case "merge":
@@ -74,33 +44,37 @@ public class WebHooksController : ControllerBase
                             mergeRequestEvent.ObjectAttributes.Title));
                         break;
                     }
-
-
             }
-            return true;
+
+            return Ok();
         }
         catch (Exception e)
         {
             _logger.LogError(e.ToString());
-            return false;
+            return Problem(statusCode: (int)HttpStatusCode.InternalServerError, detail: e.Message,
+                title: Errors.Common_Internal_Server_Error);
         }
     }
 
-    private async Task<bool> GitLabWebHookPipelineAsync(Event pipelineEvent)
+    [HttpPost("gitlab")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult> GitLabWebHookAsync(PipelineEvent pipelineEvent)
     {
         try
         {
             _logger.LogInformation(
-                        $"Receive new WebHook for {pipelineEvent.Project.Name}\n\rTitle:{pipelineEvent.ObjectAttributes.Title}");
-            await _notifier.Notify(new MergeRequestOpenedNotification(pipelineEvent.ObjectAttributes.Url,
-                pipelineEvent.ObjectAttributes.Title,
+                        $"Receive new WebHook for {pipelineEvent.Project.Name}\n\rTitle:{pipelineEvent.Project.Name}");
+            await _notifier.Notify(new PipelineNotification(pipelineEvent.Source.Project.Url,
+                pipelineEvent.Project.Name,
                 pipelineEvent.User.Username));
-            return true;
+            return Ok();
         }
         catch (Exception e)
         {
             _logger.LogError(e.ToString());
-            return false;
+            return Problem(statusCode: (int)HttpStatusCode.InternalServerError, detail: e.Message,
+                title: Errors.Common_Internal_Server_Error);
         }
     }
 }
