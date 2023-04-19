@@ -22,25 +22,6 @@ public abstract class MergeRequestNotificationBase : Notification
         return text;
     }
 }
-
-public class SimpleNotification : MergeRequestNotificationBase
-{
-    private readonly string _message;
-    public SimpleNotification(string message)
-    {
-        _message = message;
-    }
-
-    public override string GetMessage()
-    {
-        var message =
-            "***⚠️ Уведомление ***" +
-            "\r\n" +
-            $"[{_message}]";
-        return message;
-    }
-}
-
 public class MergeRequestOpenedNotification : MergeRequestNotificationBase
 {
     private readonly string _url;
@@ -114,7 +95,7 @@ public class PipelineNotification : MergeRequestNotificationBase
             "\r\n" +
             $"[{RemoveInvalidTelegramCharacters(_title)}]({_url}) (opened by {_creator})"+
             "\r\n" +
-            $"New status: {_status}";
+            $"Status: {_status}";
         return message;
     }
 }
