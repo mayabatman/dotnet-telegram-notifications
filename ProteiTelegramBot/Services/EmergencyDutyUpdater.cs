@@ -23,6 +23,7 @@ public class EmergencyDutyUpdater
 
             var dutyService = scope.ServiceProvider.GetService<IDutyService>() ??
                               throw new InvalidOperationException("IDutyService not registered");
+            Console.WriteLine("Дёрти сервис живой");
             await dutyService.UpdateDutyAsync();
         }
         catch (Exception e)

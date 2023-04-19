@@ -84,6 +84,5 @@ app.UseCors("CorsPolicy");
 app.UseEndpoints(
     endpoints => { endpoints.MapControllers(); }
 );
-Console.WriteLine($"\n\n\n\n\nUrls from Program.cs after app.StartAsync(): {string.Join(", ", app.Urls)} \n\n\n\n\n");
 app.Run();
 

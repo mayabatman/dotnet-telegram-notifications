@@ -23,6 +23,24 @@ public abstract class MergeRequestNotificationBase : Notification
     }
 }
 
+public class SimpleNotification : MergeRequestNotificationBase
+{
+    private readonly string _message;
+    public SimpleNotification(string message)
+    {
+        _message = message;
+    }
+
+    public override string GetMessage()
+    {
+        var message =
+            "***⚠️ Уведомление ***" +
+            "\r\n" +
+            $"[{_message}]";
+        return message;
+    }
+}
+
 public class MergeRequestOpenedNotification : MergeRequestNotificationBase
 {
     private readonly string _url;
@@ -77,22 +95,26 @@ public class PipelineNotification : MergeRequestNotificationBase
     private readonly string _url;
     private readonly string _title;
     private readonly string _creator;
+    private readonly string _status;
 
 
     public PipelineNotification(string url,
-        string title, string creator)
+        string title, string creator, string status)
     {
         _url = url;
         _title = title;
         _creator = creator;
+        _status = status;
     }
 
     public override string GetMessage()
     {
         var message =
-            "***⚠️ Pipeline happened ***" +
+            "***⚠️ Pipeline status changed ***" +
             "\r\n" +
-            $"[{RemoveInvalidTelegramCharacters(_title)}]({_url}) (opened by {_creator})";
+            $"[{RemoveInvalidTelegramCharacters(_title)}]({_url}) (opened by {_creator})"+
+            "\r\n" +
+            $"New status: {_status}";
         return message;
     }
 }
