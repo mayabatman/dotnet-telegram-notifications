@@ -1,10 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace ProteiTelegramBot.Models
 {
     public class Event
     {
-        public string object_kind { get; set; }
+        [JsonProperty("object_kind")]
+        public string ObjectKind { get; set; }
 
     }
 }

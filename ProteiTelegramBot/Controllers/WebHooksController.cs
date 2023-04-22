@@ -34,9 +34,9 @@ public class WebHooksController : ControllerBase
             //преобразуем в базовый класс для событий
             Event requestEvent = JsonConvert.DeserializeObject<Event>(body);
             _logger.LogInformation(
-                 $"Receive new WebHook with kind: {requestEvent.object_kind}");
+                 $"Receive new WebHook with kind: {requestEvent.ObjectKind}");
             //в зависимости от типа запроса, вызываем один из методов
-            switch (requestEvent.object_kind)
+            switch (requestEvent.ObjectKind)
             {
                 case "pipeline":
                     { 
@@ -70,20 +70,20 @@ public class WebHooksController : ControllerBase
         try
         {
             _logger.LogInformation(
-                        $"Received WebHook is for {mergeRequestEvent.project.name}\n\rTitle:{mergeRequestEvent.object_attributes.title}");
-            switch (mergeRequestEvent.object_attributes.action)
+                        $"Received WebHook is for {mergeRequestEvent.Project.Name}\n\rTitle:{mergeRequestEvent.ObjectAttributes.Title}");
+            switch (mergeRequestEvent.ObjectAttributes.Action)
             {
                 case "open":
                     {
-                        await _notifier.Notify(new MergeRequestOpenedNotification(mergeRequestEvent.object_attributes.url,
-                            mergeRequestEvent.object_attributes.title,
-                            mergeRequestEvent.user.username));
+                        await _notifier.Notify(new MergeRequestOpenedNotification(mergeRequestEvent.ObjectAttributes.Url,
+                            mergeRequestEvent.ObjectAttributes.Title,
+                            mergeRequestEvent.User.Username));
                         break;
                     }
                 case "merge":
                     {
-                        await _notifier.Notify(new MergeRequestMergedNotification(mergeRequestEvent.object_attributes.url,
-                            mergeRequestEvent.object_attributes.title));
+                        await _notifier.Notify(new MergeRequestMergedNotification(mergeRequestEvent.ObjectAttributes.Url,
+                            mergeRequestEvent.ObjectAttributes.Title));
                         break;
                     }
             }
@@ -101,12 +101,12 @@ public class WebHooksController : ControllerBase
         try
         {
             _logger.LogInformation(
-                           $"Received WebHook Pipeline for {pipelineEvent.project.name} " +
-                           $"\n\rwith status: {pipelineEvent.object_attributes.status}");
-            if (pipelineEvent.object_attributes.status != "success")
+                           $"Received WebHook Pipeline for {pipelineEvent.Project.Name} " +
+                           $"\n\rwith status: {pipelineEvent.ObjectAttributes.Status}");
+            if (pipelineEvent.ObjectAttributes.Status != "success")
             {
                
-                await _notifier.Notify(new PipelineNotification(pipelineEvent.project.web_url, pipelineEvent.project.name, pipelineEvent.object_attributes.status));
+                await _notifier.Notify(new PipelineNotification(pipelineEvent.Project.Url, pipelineEvent.Project.Name, pipelineEvent.ObjectAttributes.Status));
                 return true;
             }
             else return false;
