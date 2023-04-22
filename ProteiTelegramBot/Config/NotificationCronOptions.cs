@@ -4,5 +4,5 @@ public class NotificationCronOptions
 {
     public const string NotificationCron = nameof(NotificationCron);
 
-    public int NotifyDutyAtHourUtc { get; set; } = 14;
+    public int NotifyDutyAtHourUtc { get; set; } = 5;
 }

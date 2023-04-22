@@ -74,26 +74,24 @@ public class MergeRequestMergedNotification : MergeRequestNotificationBase
 public class PipelineNotification : MergeRequestNotificationBase
 {
     private readonly string _url;
-    private readonly string _title;
-    private readonly string _creator;
+    private readonly string _name;
     private readonly string _status;
 
 
     public PipelineNotification(string url,
-        string title, string creator, string status)
+        string name, string status)
     {
         _url = url;
-        _title = title;
-        _creator = creator;
+        _name = name;
         _status = status;
     }
 
     public override string GetMessage()
     {
         var message =
-            "***⚠️ Pipeline status changed ***" +
+            "***⚠️ Pipeline failed ***" +
             "\r\n" +
-            $"[{RemoveInvalidTelegramCharacters(_title)}]({_url}) (opened by {_creator})"+
+            $"Project: [{RemoveInvalidTelegramCharacters(_name)}]({_url})"+
             "\r\n" +
             $"Status: {_status}";
         return message;

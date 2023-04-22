@@ -40,7 +40,7 @@ public class WebHooksController : ControllerBase
             {
                 case "pipeline":
                     { 
-                        PipelineEvent? pipelineEvent = JsonConvert.DeserializeObject<PipelineEvent>(body);
+                        var pipelineEvent = JsonConvert.DeserializeObject<PipelineEvent>(body);
                         if (await GitLabWebHookPipelineAsync(pipelineEvent))
                             return Ok();
                         break;
@@ -48,7 +48,7 @@ public class WebHooksController : ControllerBase
                 case "merge_request":
                     {
                         
-                        MergeRequestEvent? mergeRequestEvent = JsonConvert.DeserializeObject<MergeRequestEvent>(body);
+                        var mergeRequestEvent = JsonConvert.DeserializeObject<MergeRequestEvent>(body);
                         if (await GitLabWebHookMergeRequestAsync(mergeRequestEvent))
                             return Ok();
                         break;
@@ -101,9 +101,15 @@ public class WebHooksController : ControllerBase
         try
         {
             _logger.LogInformation(
-                        $"Received WebHook is for {pipelineEvent.project.name}");
-            await _notifier.Notify(new PipelineNotification(pipelineEvent.project.web_url, pipelineEvent.project.name, pipelineEvent.user.username, pipelineEvent.object_attributes.status));
-            return true;
+                           $"Received WebHook Pipeline for {pipelineEvent.project.name} " +
+                           $"\n\rwith status: {pipelineEvent.object_attributes.status}");
+            if (pipelineEvent.object_attributes.status != "success")
+            {
+               
+                await _notifier.Notify(new PipelineNotification(pipelineEvent.project.web_url, pipelineEvent.project.name, pipelineEvent.object_attributes.status));
+                return true;
+            }
+            else return false;
         }
         catch (Exception e)
         {
